@@ -1,11 +1,16 @@
 <?php
-
-error_reporting(E_ERROR);
+//error_reporting(E_ALL);
+ini_set('display_errors', 1);
+//error_reporting(E_ERROR);
 
 set_time_limit(0);
+
+
 // Store in DB by API Request
 function callAPI($method, $url, $data)
 {
+    $current_date = date("Y-m-d H:i:s");
+
     $curl = curl_init();
     switch ($method) {
         case "POST":
@@ -32,9 +37,9 @@ function callAPI($method, $url, $data)
     // EXECUTE:
     $result = curl_exec($curl);
     if (!$result) {
-        die("$current_date - Could not connect to glfinder-api.");
+        die("$current_date - Could not connect to glfinder-api.\r\n");
     } else {
-        echo "$current_date - Sending data to the database - request successful.";
+        echo "$current_date - Sending data to the database - request successful.\r\n";
     }
     curl_close($curl);
     return $result;
@@ -43,15 +48,17 @@ function callAPI($method, $url, $data)
 // Get data from imgur
 function imgur_data($imgur_id)
 {
+    $current_date = date("Y-m-d H:i:s");
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_URL, "https://api.allorigins.win/raw?url=https://imgur.com/ajaxalbums/getimages/$imgur_id/hit.json");
     curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
     $result = curl_exec($ch);
     if (!$result) {
-        die("$current_date - Could not connect to api.allorigin.win (CDN to IMGUR).");
+        die("$current_date - Could not connect to api.allorigin.win (CDN to IMGUR).\r\n");
     } else {
-        echo "$current_date - Retrieving data from AllOrigins (IMGUR CDN) - request successful";
+        echo "$current_date - Retrieving data from AllOrigins (IMGUR CDN) - request successful\r\n";
     }
     curl_close($ch);
     return $result;
@@ -67,7 +74,6 @@ function unique_key($array, $keyname)
         if (!isset($new_array[$value[$keyname]])) {
             $new_array[$value[$keyname]] = $value;
         }
-
     }
     $new_array = array_values($new_array);
     return $new_array;
@@ -76,6 +82,8 @@ function unique_key($array, $keyname)
 // Get PushShift API Responses
 function get_content($URL)
 {
+    $current_date = date("Y-m-d H:i:s");
+
     // echo '<pre>';
     // echo 'URL  ';
     // print_r($URL);
@@ -84,15 +92,15 @@ function get_content($URL)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_URL, $URL);
     curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    $data = curl_exec($ch); 
+    $data = curl_exec($ch);
     // echo '<pre>';
     // echo 'data  ';
     // print_r($data);
     // echo '</pre>';
     if (!$data) {
-        die("$current_date - Could not connect to PushShift.");
+        die("$current_date - Could not connect to PushShift.\r\n");
     } else {
-        echo "$current_date - Retrieving data from PushShift - request successful";
+        echo "$current_date - Retrieving data from PushShift - request successful\r\n";
     }
     curl_close($ch);
     return $data;
@@ -148,7 +156,7 @@ function results($timestamp, $subreddit, $size)
 
                 foreach ($unique_arr as $key => $value) {
                     if ($value['reddit_link_id'] == $submissions_title['id']) {
-                        if (in_array($submissions_title['link_flair_text'], $flairs_arr)) {
+                        if (isset($submissions_title['link_flair_text']) && in_array($submissions_title['link_flair_text'], $flairs_arr)) {
 
                             $gl_counter = 0;
                             foreach ($no_dupes as $gl_count) {
@@ -187,7 +195,10 @@ function results($timestamp, $subreddit, $size)
                                 $re = '/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i';
                                 preg_match_all($re, $submissions_title['selftext'], $matches, PREG_SET_ORDER, 0);
 
-                                if (!empty($matches)) {
+                                if (!empty($matches)){
+                                    echo '<pre>';
+                                    print_r($matches);
+                                    echo '</pre>';
                                     foreach ($matches as $match) {
                                         if (stripos($match[0], 'imgur.com') !== false) {
                                             $unique_arr[$key]['imgur_iframe'] = $match[0];
@@ -203,7 +214,6 @@ function results($timestamp, $subreddit, $size)
                                     }
                                     unset($matches, $match);
                                 }
-
                             }
 
                             if (isset($submissions_title['preview'])) {
@@ -220,48 +230,45 @@ function results($timestamp, $subreddit, $size)
                                 $unique_arr[$key]['thumbnail_link'] = $submissions_title['thumbnail'];
                             }
 
-                            if (isset($unique_arr[$key]['imgur_iframe'])) {
-
-                                $id = pathinfo($unique_arr[$key]['imgur_iframe'], PATHINFO_FILENAME);
-                                $imgur_data = json_decode(imgur_data($id), true);
-
-                                if (!empty($imgur_data["data"]["images"])) {
-
-                                    if ($unique_arr[$key]['thumbnail_link'] == null) {
-                                        $imgur_url = $imgur_data["data"]["images"][0]["hash"] . $imgur_data["data"]["images"][0]["ext"];
-                                        $unique_arr[$key]['thumbnail_link'] = "https://i.imgur.com/$imgur_url";
-                                    }
-
-                                    if (strtolower(pathinfo($unique_arr[$key]['thumbnail_link'], PATHINFO_EXTENSION)) == "mp4") {
-                                        $unique_arr[$key]['thumbnail_link'] = null;
-                                    }
-
-                                    if (!isset($unique_arr[$key]['w2c_link']) || $unique_arr[$key]['w2c_link'] == null) {
-                                        foreach ($imgur_data["data"]["images"] as $images) {
-                                            if ($images['description'] != null || $images['description'] != "") {
-                                                $image_description = str_replace(' ', '', $images['description']);
-
-                                                $re = '/(http|ftp|https):\/\/([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\\\/\?\.\:\;\'\,]*)?/m';
-                                                preg_match_all($re, $image_description, $matches, PREG_SET_ORDER, 0);
-
-                                                if (!empty($matches)) {
-                                                    foreach ($matches as $match) {
-                                                        $unique_arr[$key]['w2c_link'] = $match[0];
-                                                    }
-                                                    unset($matches);
-                                                }
-                                                unset($image_description);
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-
+//                            if (isset($unique_arr[$key]['imgur_iframe'])) {
+// 
+//                                 $id = pathinfo($unique_arr[$key]['imgur_iframe'], PATHINFO_FILENAME);
+//                                 $imgur_data = json_decode(imgur_data($id), true);
+// 
+//                                 if (!empty($imgur_data["data"]["images"])) {
+// 
+//                                     if ($unique_arr[$key]['thumbnail_link'] == null) {
+//                                         $imgur_url = $imgur_data["data"]["images"][0]["hash"] . $imgur_data["data"]["images"][0]["ext"];
+//                                         $unique_arr[$key]['thumbnail_link'] = "https://i.imgur.com/$imgur_url";
+//                                    }
+//
+//                                    if (strtolower(pathinfo($unique_arr[$key]['thumbnail_link'], PATHINFO_EXTENSION)) == "mp4") {
+//                                        $unique_arr[$key]['thumbnail_link'] = null;
+//                                    }
+//
+//                                    if (!isset($unique_arr[$key]['w2c_link']) || $unique_arr[$key]['w2c_link'] == null) {
+//                                        foreach ($imgur_data["data"]["images"] as $images) {
+//                                            if ($images['description'] != null || $images['description'] != "") {
+//                                                $image_description = str_replace(' ', '', $images['description']);
+//
+//                                                $re = '/(http|ftp|https):\/\/([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\\\/\?\.\:\;\'\,]*)?/m';
+//                                                preg_match_all($re, $image_description, $matches, PREG_SET_ORDER, 0);
+//
+//                                                if (!empty($matches)) {
+//                                                    foreach ($matches as $match) {
+//                                                        $unique_arr[$key]['w2c_link'] = $match[0];
+//                                                    }
+//                                                    unset($matches);
+//                                                }
+//                                                unset($image_description);
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
                         } else {
                             unset($unique_arr[$key]);
                         }
-
                     }
                 }
             }
@@ -271,24 +278,51 @@ function results($timestamp, $subreddit, $size)
         }
     }
 
+
     return array_reduce($final_arr, 'array_merge', array());
 }
 
 $timestamp = time();
-$subreddits_array = ["fashionreps", "repsneakers", "flexicas", "designerreps", "reptime", "repladies","couturereps"];
+$subreddits_array = ["fashionreps", "repsneakers", "flexicas", "designerreps", "reptime", "repladies", "couturereps"];
 $size = 1000;
 
 foreach ($subreddits_array as $subreddits) {
     foreach (results($timestamp, $subreddits, $size) as $result) {
+        $i =  "https://www.reddit.com$result[reddit_link].json";
+        $curl= curl_init();
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_URL, $i);
+        $res = curl_exec($curl);
+        curl_close($curl);
+        $x  = json_decode($res,True);
+        $re = '/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i';
+        preg_match_all($re, $res, $matches, PREG_SET_ORDER, 0);
+            if (!empty($matches)) {
+                echo 'not empty matches';
+                foreach ($matches as $match) {
+                    if (stripos($match[0], 'imgur.com') !== false) {
+                        $result['imgur_iframe'] = $match[0];
+                        // print_r($result['imgur_iframe']);
+                        // echo ' in imurgur ';
+                    }
+
+                    if (stripos($match[0], 'taobao.com') !== false) {
+                        $result['w2c_link'] = $match[0];
+                        // print_r($result['w2c_link']);
+                        // echo ' in w2c ';
+                    }                           
+
+                    if (stripos($match[0], 'weidian.com') !== false) {
+                        $result['w2c_link'] = $match[0];
+                        // print_r($result['w2c_link']);
+                        // echo ' in weidian ';
+                    }
+                }
+            }
 
         // callAPI('PUT', "http://glfinder-api:8080/feeds/$subreddits", json_encode($result, JSON_UNESCAPED_SLASHES));
         callAPI('PUT', "http://127.0.0.1:5000/feeds/$subreddits", json_encode($result, JSON_UNESCAPED_SLASHES));
-
     }
     unset($result);
 }
 unset($subreddits);
-
-
-?>
-

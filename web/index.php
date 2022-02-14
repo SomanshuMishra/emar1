@@ -76,12 +76,11 @@ if (isset($_GET['search'])) {
     $subreddit = filter_input(INPUT_POST, 'subreddit', FILTER_SANITIZE_STRING);
 
     if (in_array($subreddit, $subreddits_array)) {
-        $data = callAPI('POST', $baseURL+"feeds/filter/$subreddit", json_encode(array("keyword" => $search_query), JSON_UNESCAPED_SLASHES));
+        $data = callAPI('POST', $baseURL + "feeds/filter/$subreddit", json_encode(array("keyword" => $search_query), JSON_UNESCAPED_SLASHES));
         die($data);
     } else {
         die(json_encode(array("status" => "failed")));
     }
-
 }
 
 if (isset($_GET['subreddit']) && in_array($_GET['subreddit'], $subreddits_array)) {
@@ -108,7 +107,7 @@ if (isset($_GET['size']) && in_array($_GET['size'], $entries_array)) {
 if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
     $w2c_only = 'checked';
     $w2c_uri = '&w2c_only=yes';
-}else {
+} else {
     $w2c_only = 'unchecked';
     $w2c_uri = '&w2c_only=no';
 }
@@ -117,6 +116,7 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta subreddit="<?php echo $subreddit; ?>">
@@ -124,10 +124,16 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
     <title>GLFinder - Replica Quality Control</title>
     <meta name="title" content="GLFinder - Quality Control your Replicas!">
     <meta name="description" content="Archive of replicas that have gone through the quality control and successfully passed through.">
-    <link rel="icon" type="image/png" href="assets/favicon.png"/>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <!-- <link rel="stylesheet" href="assets/css/bootstrap.min.css"> -->
     <script src="https://kit.fontawesome.com/8a64eb2445.js" crossorigin="anonymous"></script>
     <script src="assets/js/lazyload.min.js"></script>
+
+    <!-- Bootstrap v5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Custom Bootstrap Theming -->
+    <link rel="stylesheet" href="assets/css/bootstrap.custom.css">
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149670194-2"></script>
@@ -264,13 +270,14 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                 float: unset !important;
             }
         }
-
     </style>
     <link href="assets/album/css/album.css" rel="stylesheet">
 </head>
+
 <body>
-<a href="javascript:" id="return-to-top"><i class="fas fa-chevron-up"></i></a>
-<header>
+    <a href="javascript:" id="return-to-top"><i class="fas fa-chevron-up"></i></a>
+    <!-- Header old -->
+    <!-- <header>
     <div class="navbar navbar-dark bg-dark shadow-sm">
         <div class="container d-flex justify-content-between">
             <a href="/" class="navbar-brand d-flex align-items-center">
@@ -284,428 +291,526 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
             </a>
         </div>
     </div>
-</header>
-
-<main role="main">
-
-    <div class="album py-3 bg-light">
+</header> -->
+    <!-- Header new -->
+    <header class="p-3 border-bottom sticky-top bg-body" id="header-nav">
         <div class="container">
-            <div class="pb-3">
-                <label for="filterword">Filter List</label>
-                <input type="text" name="filterword" id="filterword" >
-                <select class="custom-select custom-select-sm w-auto float-right" name="subreddit" id="subreddit"
-                        style="vertical-align: unset;">
-                    <option value='' <?php if (!isset($subreddit)) {
-                        echo "selected";
-                    } ?> disabled>Pick a subreddit
-                    </option>
-                    <?php foreach ($subreddits_array as $key => $value) {
-                        if ($subreddit == $value) {
-                            $selected = "selected";
-                        }
-                        echo "<option value='$value' $selected>r/$value</option>";
-                        unset($selected);
-                    } ?>
-                </select>
-                &nbsp;
-                <select class="custom-select custom-select-sm w-auto float-right" name="quantity" id="quantity"
-                        style="vertical-align: unset;">
-                    <?php foreach ($entries_array as $key => $entries) {
-                        if ($size == $entries) {
-                            $selected = "selected";
-                        }
-                        echo "<option value='$entries' $selected>$entries Entries</option>";
-                        unset($selected);
-                    } ?>
-                </select>
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+                    <svg xmlns="https://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mt-1 mr-2" viewBox="0 0 24 24" focusable="false">
+                        <image href="https://glfinder.com/assets/favicon.png" width="20" height="20"></image>
+                    </svg>
+                    <strong class="ps-1">GL Finder</strong>
+                </a>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="w2c_only" <?php echo $w2c_only; ?>>
-                    <label class="form-check-label" for="w2c_only">W2C Only</label>
-                </div>
-            </div>
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                    <!--<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> -->
+                </ul>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="main_holder">
-                <?php
-                $results_data = results($timestamp, $subreddit, $size);
-                foreach ($results_data['assets'] as $datum) {
-
-                    if (isset($datum['imgur_iframe'])) {
-                        $imgur_preview = $datum['imgur_iframe'];
-                    }
-
-                    if ($datum['thumbnail_link'] != null) {
-                        $image = "$datum[thumbnail_link]";
-                    }
-
-                    if ($datum['w2c_link'] != null) {
-                        $w2c = "$datum[w2c_link]";
-                    }
-
-                    if ($datum['gl_counter'] !== 1) {
-                        $gl_counter = $datum['gl_counter'];
-                    }
-
-                    ?>
-                    <div class="item col" <?php echo "data-id='$datum[reddit_link_id]'" ?>>
-                        <div class="card mb-4 shadow-sm">
-                            <a href="<?php echo "https://www.reddit.com$datum[reddit_link]"; ?>" target='_blank'
-                               rel='noreferrer'>
-                                <?php if (!isset($image)) { ?>
-                                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
-                                         xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                                         focusable="false"
-                                         role="img" aria-label="Thumbnail">
-                                        <title><?php echo "$datum[reddit_title]"; ?></title>
-                                        <rect width="100%" height="100%" fill="#55595c"/>
-                                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text>
-                                    </svg>
-                                <?php } else { ?>
-                                    <img class="bd-placeholder-img card-img-top lazy"
-                                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3C/svg%3E"
-                                         data-src="<?php echo "$image"; ?>"
-                                         alt="<?php echo "$datum[reddit_title]"; ?>"
-                                         title="<?php echo "$datum[reddit_title]"; ?>"
-                                         height="225" width="100%" style="object-fit: cover;object-position: 50% 50%"/>
-                                <?php } ?>
-                            </a>
-
-                            <div class="card-body flex-column h-100">
-                                <p class="card-text"><?php echo "$datum[reddit_title]"; ?></p>
-                                <div class="justify-content-between align-items-center">
-                                    <small class="text-muted post_date" <?php $date = $datum['reddit_created_utc'];
-                                    echo "data-timestamp='$date'";
-                                    unset($date); ?>></small>
-                                    <div class="btn-group float-right">
-                                        <?php if (isset($imgur_preview)) { ?>
-                                            <a href="<?php echo $imgur_preview; ?>"
-                                               class="btn btn-sm btn-outline-secondary" target='_blank'
-                                               rel='noreferrer'>Imgur</a>
-                                        <?php }
-                                        if (isset($w2c)) { ?>
-                                            <a href="<?php echo $w2c; ?>" class="btn btn-sm btn-outline-secondary"
-                                               target='_blank' rel='noreferrer'>W2C</a>
-                                        <?php } ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php if (isset($gl_counter)) { ?>
-                                <div class="circle">
-                                    <p class="text-circle"><?php echo $gl_counter; ?></p>
-                                </div>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <?php
-                    unset($titulo, $image, $imgur_preview, $w2c, $gl_counter);
-                    $last_timestamp = $datum['reddit_created_utc'];
-                }
-                unset($datum);
-
-                ?>
-
-            </div>
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="search_holder" hidden>
+                <!--                 <form class="d-flex">
+                    <input class="form-control me-2" type="text" placeholder="Filter List" aria-label="Search" name="filterword" id="filterword">
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </form> -->
 
             </div>
         </div>
+    </header>
+    <!-- #Header new -->
+
+    <!-- Hero -->
+    <div class="px-4 py-5 text-center" style="background-image: url(https://image.shutterstock.com/shutterstock/photos/1870253185/display_1500/stock-photo-store-wall-with-white-sneakers-1870253185.jpg);background-size: cover;">
+        <img class="d-block mx-auto mb-4" src="https://glfinder.com/assets/favicon.png" alt="" width="75" height="75">
+        <h1 class="display-5 fw-bold">GL Finder</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4">
+                Voluptas repudiandae odit iure quia blanditiis. Illo error nihil veritatis assumenda. Est et saepe
+                corrupti possimus id quis quo. Inventore et et animi sunt odio voluptatem. Non laudantium quia ipsum
+                blanditiis repudiandae explicabo incidunt eveniet.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Primary button</button>
+                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Secondary</button>
+            </div>
+        </div>
     </div>
+    <!-- #Hero -->
 
-</main>
 
-<footer class="text-muted">
-    <div class="container">
-        <a id="next_page" href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>"
-           data-href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>">Next</a>
-    </div>
-</footer>
 
-<script src="assets/js/jquery-3.5.1.min.js"></script>
-<script src="assets/js/popper.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/moment-with-locales.min.js"></script>
-<script>
-    $(document).ready(function () {
+    <main role="main">
 
-        function tooltip() {
-            $('.circle').tooltip({
-                trigger: "hover",
-                placement: "top",
-                title: "Total GL's"
-            })
-        }
+        <div class="album py-3 bg-light">
+            <div class="container">
+                <div class="pb-3">
+                    <label for="filterword">Filter List</label>
+                    <input type="text" name="filterword" id="filterword">
+                    <select class="custom-select custom-select-sm w-auto float-right" name="subreddit" id="subreddit" style="vertical-align: unset;">
+                        <option value='' <?php if (!isset($subreddit)) {
+                                                echo "selected";
+                                            } ?> disabled>Pick a subreddit
+                        </option>
+                        <?php foreach ($subreddits_array as $key => $value) {
+                            if ($subreddit == $value) {
+                                $selected = "selected";
+                            }
+                            echo "<option value='$value' $selected>r/$value</option>";
+                            unset($selected);
+                        } ?>
+                    </select>
+                    &nbsp;
+                    <select class="custom-select custom-select-sm w-auto float-right" name="quantity" id="quantity" style="vertical-align: unset;">
+                        <?php foreach ($entries_array as $key => $entries) {
+                            if ($size == $entries) {
+                                $selected = "selected";
+                            }
+                            echo "<option value='$entries' $selected>$entries Entries</option>";
+                            unset($selected);
+                        } ?>
+                    </select>
 
-        $('[data-toggle="tooltip"]').tooltip();
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="w2c_only" <?php echo $w2c_only; ?>>
+                        <label class="form-check-label" for="w2c_only">W2C Only</label>
+                    </div>
+                </div>
 
-        $(window).scroll(function () {
-            if ($(this).scrollTop() >= 50) {
-                $('#return-to-top').fadeIn(200);
-            } else {
-                $('#return-to-top').fadeOut(200);
-            }
-        });
-        $('#return-to-top').click(function () {
-            $('body,html').animate({
-                scrollTop: 0
-            }, 500);
-        });
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="main_holder">
+                    <?php
+                    $results_data = results($timestamp, $subreddit, $size);
+                    foreach ($results_data['assets'] as $datum) {
 
-        var lazyLoadInstance = new LazyLoad({
-            elements_selector: ".lazy",
-            use_native: true
-        });
+                        if (isset($datum['imgur_iframe'])) {
+                            $imgur_preview = $datum['imgur_iframe'];
+                        }
 
-        //Filter Vars
-        var typingTimer;
-        var doneTypingInterval = 1000;
-        var $search = $('#filterword');
+                        if ($datum['w2c_link'] != null) {
+                            $w = "$datum[w2c_link]";
+                            //echo $w;
+                            //echo 'WWW';
+                            $p = "/<\//";
+                            //$w2c = preg_replace('&lt;/a&gt;&lt;/p&gt;', '', $w);
+                            $w2c = str_ireplace(array('&lt;/a&gt;', '&lt;/p&gt;'), '', $w);
+                            //echo $w2c; 
+                        }
 
-        function convert_dates() {
+                        if ($datum['thumbnail_link'] != null) {
+                            $image = "$datum[thumbnail_link]";
+                            // echo '<pre>';
+                            // echo strlen($image);
+                            // echo $datum['reddit_title'];   
+                            $imgHeaders = @get_headers(str_replace(" ", "%20", $image))[0];
+                            if ($imgHeaders == 'HTTP/1.1 404 Not Found') {
+                                $image = NULL;
+                                //$i =  "https://www.reddit.com/$datum[reddit_link].json";
+                                // echo $x;
+                                //$curl= curl_init();
+                                //curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                                //curl_setopt($curl, CURLOPT_URL, $i);
+                                //$res = curl_exec($curl);
+                                //curl_close($curl);
+                                //$t = json_decode($res,True)[1]['data']['children'][2]['data']['replies']['data']['children'][0]['data']['body'];
+                                //$word = 'https://item.taobao.com';
+                                //if (strpos($t, $word) === FALSE) {
 
-            var locale = window.navigator.userLanguage || window.navigator.language;
-            moment.locale(locale);
+                                //}else{
+                                //	echo $t;
+                                //    $w2c = $t;
+                                //}
+                            }
+                        } else {
+                            // $image = null;
+                            $i =  "https://www.reddit.com/$datum[reddit_link].json";
+                            // echo $x;
+                            // $u  = 'https://www.reddit.com/r/FashionReps/comments/sd4u1o/qc_lv_belt_from_bs_v2_wouldnt_let_me_put_the_pics/.json';
+                            $curl = curl_init();
+                            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($curl, CURLOPT_URL, $i);
+                            $res = curl_exec($curl);
+                            curl_close($curl);
+                            $x = json_decode($res, True)[0]['data']['children'][0]['data']['thumbnail'];
+                            // echo 'x value here \n';
+                            // echo $x;
+                            //$t = json_decode($res,True)[1]['data']['children'][2]['data']['replies']['data']['children'][0]['data']['body'];
+                            //$word = 'https://item.taobao.com';
+                            //if (strpos($t, $word) === FALSE) {
 
-            var localeData = moment.localeData();
-            var format = localeData.longDateFormat('L');
+                            //}else{
+                            //   $w2c = $t;
+                            //}
 
-            $('small.post_date').each(function () {
-                var date = $(this).data('timestamp');
-                var m1 = moment(moment.unix(date), format);
-                $(this).text(m1.format(format));
-            })
-        }
+                            if (strlen($x) < 20) {
+                                //echo 'inside if';
+                                $image = NULL;
+                            } else {
+                                // echo 'in else statement';
+                                $image = $x;
+                            }
+                        }
 
-        function getUrlVars() {
-            var vars = [], hash;
-            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-            for (var i = 0; i < hashes.length; i++) {
-                hash = hashes[i].split('=');
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
-            }
-            return vars;
-        }
 
-        function removeURLParameter(url, parameter) {
-            //prefer to use l.search if you have a location/link object
-            var urlparts = url.split('?');
-            if (urlparts.length >= 2) {
+                        //                    if ($datum['w2c_link'] != null) {
+                        //                       $w2c = "$datum[w2c_link]";
+                        //                    }
 
-                var prefix = encodeURIComponent(parameter) + '=';
-                var pars = urlparts[1].split(/[&;]/g);
+                        if ($datum['gl_counter'] !== 1) {
+                            $gl_counter = $datum['gl_counter'];
+                        }
+                        //if ($image!=null){
+                        //    $imgHeaders = @get_headers( str_replace(" ", "%20", $image) )[0];
+                        //    if( $imgHeaders == 'HTTP/1.1 404 Not Found' ) {
+                        //        //img doesn't exist
+                        //        $image  = null;
+                        //    }
+                        //}
+                    ?>
+                        <div class="item col" <?php echo "data-id='$datum[reddit_link_id]'" ?>>
+                            <div class="card mb-4 shadow-sm">
+                                <a href="<?php echo "https://www.reddit.com$datum[reddit_link]"; ?>" target='_blank' rel='noreferrer'>
+                                    <?php if (!isset($image)) { ?>
+                                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Thumbnail">
+                                            <title><?php echo "$datum[reddit_title]"; ?></title>
+                                            <rect width="100%" height="100%" fill="#55595c" />
+                                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text>
+                                        </svg>
+                                    <?php } else { ?>
+                                        <img class="bd-placeholder-img card-img-top lazy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3C/svg%3E" data-src="<?php echo "$image"; ?>" alt="<?php echo "$datum[reddit_title]"; ?>" title="<?php echo "$datum[reddit_title]"; ?>" height="225" width="100%" style="object-fit: cover;object-position: 50% 50%" />
+                                    <?php } ?>
+                                </a>
 
-                //reverse iteration as may be destructive
-                for (var i = pars.length; i-- > 0;) {
-                    //idiom for string.startsWith
-                    if (pars[i].lastIndexOf(prefix, 0) !== -1) {
-                        pars.splice(i, 1);
+                                <div class="card-body flex-column h-100">
+                                    <p class="card-text"><?php echo "$datum[reddit_title]"; ?></p>
+                                    <div class="justify-content-between align-items-center">
+                                        <small class="text-muted post_date" <?php $date = $datum['reddit_created_utc'];
+                                                                            echo "data-timestamp='$date'";
+                                                                            unset($date); ?>></small>
+                                        <div class="btn-group float-right">
+                                            <?php if (isset($imgur_preview)) { ?>
+                                                <a href="<?php echo $imgur_preview; ?>" class="btn btn-sm btn-outline-secondary" target='_blank' rel='noreferrer'>Imgur</a>
+                                            <?php }
+                                            if (isset($w2c)) { ?>
+                                                <a href="<?php echo $w2c; ?>" class="btn btn-sm btn-outline-secondary" target='_blank' rel='noreferrer'>W2C</a>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php if (isset($gl_counter)) { ?>
+                                    <div class="circle">
+                                        <p class="text-circle"><?php echo $gl_counter; ?></p>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    <?php
+                        unset($titulo, $image, $imgur_preview, $w2c, $gl_counter);
+                        $last_timestamp = $datum['reddit_created_utc'];
                     }
+                    unset($datum);
+
+                    ?>
+
+                </div>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="search_holder" hidden>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-muted">
+        <div class="container">
+            <a id="next_page" href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>" data-href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>">Next</a>
+        </div>
+    </footer>
+
+    <script src="assets/js/jquery-3.5.1.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/moment-with-locales.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            function tooltip() {
+                $('.circle').tooltip({
+                    trigger: "hover",
+                    placement: "top",
+                    title: "Total GL's"
+                })
+            }
+
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $(window).scroll(function() {
+                if ($(this).scrollTop() >= 50) {
+                    $('#return-to-top').fadeIn(200);
+                } else {
+                    $('#return-to-top').fadeOut(200);
+                }
+            });
+            $('#return-to-top').click(function() {
+                $('body,html').animate({
+                    scrollTop: 0
+                }, 500);
+            });
+
+            var lazyLoadInstance = new LazyLoad({
+                elements_selector: ".lazy",
+                use_native: true
+            });
+
+            //Filter Vars
+            var typingTimer;
+            var doneTypingInterval = 1000;
+            var $search = $('#filterword');
+
+            function convert_dates() {
+
+                var locale = window.navigator.userLanguage || window.navigator.language;
+                moment.locale(locale);
+
+                var localeData = moment.localeData();
+                var format = localeData.longDateFormat('L');
+
+                $('small.post_date').each(function() {
+                    var date = $(this).data('timestamp');
+                    var m1 = moment(moment.unix(date), format);
+                    $(this).text(m1.format(format));
+                })
+            }
+
+            function getUrlVars() {
+                var vars = [],
+                    hash;
+                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                for (var i = 0; i < hashes.length; i++) {
+                    hash = hashes[i].split('=');
+                    vars.push(hash[0]);
+                    vars[hash[0]] = hash[1];
+                }
+                return vars;
+            }
+
+            function removeURLParameter(url, parameter) {
+                //prefer to use l.search if you have a location/link object
+                var urlparts = url.split('?');
+                if (urlparts.length >= 2) {
+
+                    var prefix = encodeURIComponent(parameter) + '=';
+                    var pars = urlparts[1].split(/[&;]/g);
+
+                    //reverse iteration as may be destructive
+                    for (var i = pars.length; i-- > 0;) {
+                        //idiom for string.startsWith
+                        if (pars[i].lastIndexOf(prefix, 0) !== -1) {
+                            pars.splice(i, 1);
+                        }
+                    }
+
+                    url = urlparts[0] + '?' + pars.join('&');
+                    return url;
+                } else {
+                    return url;
+                }
+            }
+
+            function w2c_only() {
+                var base_url = $('#next_page').data('href') + '&w2c_only=yes';
+
+                if ($('#w2c_only').is(":checked")) {
+
+                    $('#next_page').attr('href', base_url);
+
+                    $("div.btn-group").each(function(i) {
+                        var val = 'w2c';
+                        var content = $(this).find('a.btn-outline-secondary').text();
+
+                        if (content.toLowerCase().indexOf(val) == -1) {
+                            $(this).parents('div.item.col').hide();
+                        } else {
+                            $(this).parents('div.item.col').show();
+                        }
+                    });
+                }
+            }
+
+            function doneTyping() {
+                var search = $search.val();
+                if (search != "") {
+
+                    $.ajax({
+                        url: '?search',
+                        type: 'post',
+                        data: {
+                            search_query: search,
+                            subreddit: $('meta[subreddit]').attr('subreddit')
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+
+                            var len = response['assets'].length;
+
+                            $('#main_holder').prop('hidden', true);
+                            $("#search_holder").empty();
+
+                            for (var i = 0; i < len; i++) {
+
+                                var imgur_iframe = response['assets'][i]['imgur_iframe'];
+                                var reddit_created_utc = response['assets'][i]['reddit_created_utc'];
+                                var reddit_link = response['assets'][i]['reddit_link'];
+                                var reddit_link_id = response['assets'][i]['reddit_link_id'];
+                                var reddit_title = response['assets'][i]['reddit_title'];
+                                var thumbnail_link = response['assets'][i]['thumbnail_link'];
+                                var w2c_link = response['assets'][i]['w2c_link'];
+                                var gl_counter = response['assets'][i]['gl_counter'];
+
+                                var thumbnail_element = '';
+                                var imgur_element = '';
+                                var w2c_element = '';
+                                var gl_element = '';
+
+                                if (thumbnail_link != null && thumbnail_link.length > 1) {
+                                    thumbnail_element = '<img class="bd-placeholder-img card-img-top lazy" src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 3 2\'%3E%3C/svg%3E" data-src="' + thumbnail_link + '" alt="' + reddit_title + '" title="' + reddit_title + '" height="225" width="100%" style="object-fit: cover;object-position: 50% 50%"/>';
+                                } else {
+                                    thumbnail_element = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Thumbnail"><title>' + reddit_title + '</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text></svg>';
+                                }
+
+                                if (imgur_iframe != null) {
+                                    imgur_element = '<a href="' + imgur_iframe + '" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noreferrer">Imgur</a>';
+                                }
+
+                                if (w2c_link != null) {
+                                    w2c_element = '<a href="' + w2c_link + '" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noreferrer">W2C</a>';
+                                }
+
+                                if (gl_counter !== 1) {
+                                    gl_element = '<div class="circle"><p class="text-circle">' + gl_counter + '</p></div>';
+                                }
+
+                                var reddit_card = '<div class="item col" data-id="' + reddit_link_id + '">' +
+                                    '<div class="card mb-4 shadow-sm">' +
+                                    '<a href="https://www.reddit.com' + reddit_link + '" target="_blank" rel="noreferrer">' +
+                                    thumbnail_element +
+                                    '</a>' +
+                                    '<div class="card-body flex-column h-100">' +
+                                    '<p class="card-text">' + reddit_title + '</p>' +
+                                    '<div class="justify-content-between align-items-center">' +
+                                    '<small class="text-muted post_date" data-timestamp="' + reddit_created_utc + '"></small>&nbsp;' +
+                                    '<div class="btn-group float-right">' +
+                                    imgur_element +
+                                    w2c_element +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    gl_element +
+                                    '</div>' +
+                                    '</div>';
+
+                                $("#search_holder").append(reddit_card);
+                                tooltip();
+                            }
+                            convert_dates();
+                            lazyLoadInstance.update();
+                            $("#search_holder").prop('hidden', false);
+                            $('#next_page').prop('hidden', true);
+                        }
+                    });
+                } else {
+                    $("#search_holder").prop('hidden', true);
+                    $('#next_page').prop('hidden', false);
+                    $('#main_holder').prop('hidden', false);
+                }
+            }
+
+            tooltip();
+
+            convert_dates();
+
+            w2c_only();
+
+            $search.on('keyup', function() {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(doneTyping, doneTypingInterval);
+            });
+
+            $search.on('keydown', function() {
+                clearTimeout(typingTimer);
+            });
+
+
+            $('#subreddit').on('change', function() {
+                var subreddit = $(this).val();
+                var operator = '';
+
+                if (window.location.href in getUrlVars()) {
+                    operator = '?';
+                } else {
+                    operator = '&';
                 }
 
-                url = urlparts[0] + '?' + pars.join('&');
-                return url;
-            } else {
-                return url;
-            }
-        }
+                var next_url = removeURLParameter(window.location.href, 'subreddit');
 
-        function w2c_only() {
-            var base_url = $('#next_page').data('href') + '&w2c_only=yes';
+                if (subreddit) {
+                    var url = next_url + operator;
+                    window.location = url + "subreddit=" + subreddit;
+                }
 
-            if ($('#w2c_only').is(":checked")) {
+                return false;
+            });
 
-                $('#next_page').attr('href', base_url);
+            $('#quantity').on('change', function() {
+                var quantity = $(this).val();
+                var operator = '';
 
-                $("div.btn-group").each(function (i) {
-                    var val = 'w2c';
-                    var content = $(this).find('a.btn-outline-secondary').text();
+                if (window.location.href in getUrlVars()) {
+                    operator = '?';
+                } else {
+                    operator = '&';
+                }
 
-                    if (content.toLowerCase().indexOf(val) == -1) {
-                        $(this).parents('div.item.col').hide();
-                    } else {
-                        $(this).parents('div.item.col').show();
-                    }
-                });
-            }
-        }
+                var next_url = removeURLParameter(window.location.href, 'size');
 
-        function doneTyping() {
-            var search = $search.val();
-            if (search != "") {
+                if (quantity) {
+                    var url = next_url + operator;
+                    window.location = url + "size=" + quantity;
+                }
 
-                $.ajax({
-                    url: '?search',
-                    type: 'post',
-                    data: {
-                        search_query: search,
-                        subreddit: $('meta[subreddit]').attr('subreddit')
-                    },
-                    dataType: 'json',
-                    success: function (response) {
+                return false;
+            });
 
-                        var len = response['assets'].length;
+            $('#w2c_only').on('change', function() {
+                var base_url = $('#next_page').data('href') + '&w2c_only=yes';
 
-                        $('#main_holder').prop('hidden', true);
-                        $("#search_holder").empty();
+                if ($(this).is(":checked")) {
 
-                        for (var i = 0; i < len; i++) {
+                    $('#next_page').attr('href', base_url);
 
-                            var imgur_iframe = response['assets'][i]['imgur_iframe'];
-                            var reddit_created_utc = response['assets'][i]['reddit_created_utc'];
-                            var reddit_link = response['assets'][i]['reddit_link'];
-                            var reddit_link_id = response['assets'][i]['reddit_link_id'];
-                            var reddit_title = response['assets'][i]['reddit_title'];
-                            var thumbnail_link = response['assets'][i]['thumbnail_link'];
-                            var w2c_link = response['assets'][i]['w2c_link'];
-                            var gl_counter = response['assets'][i]['gl_counter'];
+                    $("div.btn-group").each(function(i) {
+                        var val = 'w2c';
+                        var content = $(this).find('a.btn-outline-secondary').text();
 
-                            var thumbnail_element = '';
-                            var imgur_element = '';
-                            var w2c_element = '';
-                            var gl_element = '';
-
-                            if (thumbnail_link != null && thumbnail_link.length > 1) {
-                                thumbnail_element = '<img class="bd-placeholder-img card-img-top lazy" src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 3 2\'%3E%3C/svg%3E" data-src="' + thumbnail_link + '" alt="' + reddit_title + '" title="' + reddit_title + '" height="225" width="100%" style="object-fit: cover;object-position: 50% 50%"/>';
-                            } else {
-                                thumbnail_element = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Thumbnail"><title>' + reddit_title + '</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text></svg>';
-                            }
-
-                            if (imgur_iframe != null) {
-                                imgur_element = '<a href="' + imgur_iframe + '" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noreferrer">Imgur</a>';
-                            }
-
-                            if (w2c_link != null) {
-                                w2c_element = '<a href="' + w2c_link + '" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noreferrer">W2C</a>';
-                            }
-
-                            if (gl_counter !== 1) {
-                                gl_element = '<div class="circle"><p class="text-circle">' + gl_counter + '</p></div>';
-                            }
-
-                            var reddit_card = '<div class="item col" data-id="' + reddit_link_id + '">' +
-                                '<div class="card mb-4 shadow-sm">' +
-                                '<a href="https://www.reddit.com' + reddit_link + '" target="_blank" rel="noreferrer">' +
-                                thumbnail_element +
-                                '</a>' +
-                                '<div class="card-body flex-column h-100">' +
-                                '<p class="card-text">' + reddit_title + '</p>' +
-                                '<div class="justify-content-between align-items-center">' +
-                                '<small class="text-muted post_date" data-timestamp="' + reddit_created_utc + '"></small>&nbsp;' +
-                                '<div class="btn-group float-right">' +
-                                imgur_element +
-                                w2c_element +
-                                '</div>' +
-                                '</div>' +
-                                '</div>' +
-                                gl_element +
-                                '</div>' +
-                                '</div>';
-
-                            $("#search_holder").append(reddit_card);
-                            tooltip();
+                        if (content.toLowerCase().indexOf(val) == -1) {
+                            $(this).parents('div.item.col').hide();
+                        } else {
+                            $(this).parents('div.item.col').show();
                         }
-                        convert_dates();
-                        lazyLoadInstance.update();
-                        $("#search_holder").prop('hidden', false);
-                        $('#next_page').prop('hidden', true);
-                    }
-                });
 
-            } else {
-                $("#search_holder").prop('hidden', true);
-                $('#next_page').prop('hidden', false);
-                $('#main_holder').prop('hidden', false);
-            }
-        }
+                    });
 
-        tooltip();
+                } else {
+                    $('div.item.col').show();
 
-        convert_dates();
+                    var next_url = removeURLParameter(base_url, 'w2c_only');
+                    $('#next_page').attr('href', next_url);
+                }
+            });
 
-        w2c_only();
+            $('#top').on('click', function(e) {
+                e.preventDefault();
+            })
 
-        $search.on('keyup', function () {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(doneTyping, doneTypingInterval);
         });
-
-        $search.on('keydown', function () {
-            clearTimeout(typingTimer);
-        });
-
-
-        $('#subreddit').on('change', function () {
-            var subreddit = $(this).val();
-            var operator = '';
-
-            if (window.location.href in getUrlVars()) {
-                operator = '?';
-            } else {
-                operator = '&';
-            }
-
-            var next_url = removeURLParameter(window.location.href, 'subreddit');
-
-            if (subreddit) {
-                var url = next_url + operator;
-                window.location = url + "subreddit=" + subreddit;
-            }
-
-            return false;
-        });
-
-        $('#quantity').on('change', function () {
-            var quantity = $(this).val();
-            var operator = '';
-
-            if (window.location.href in getUrlVars()) {
-                operator = '?';
-            } else {
-                operator = '&';
-            }
-
-            var next_url = removeURLParameter(window.location.href, 'size');
-
-            if (quantity) {
-                var url = next_url + operator;
-                window.location = url + "size=" + quantity;
-            }
-
-            return false;
-        });
-
-        $('#w2c_only').on('change', function () {
-            var base_url = $('#next_page').data('href') + '&w2c_only=yes';
-
-            if ($(this).is(":checked")) {
-
-                $('#next_page').attr('href', base_url);
-
-                $("div.btn-group").each(function (i) {
-                    var val = 'w2c';
-                    var content = $(this).find('a.btn-outline-secondary').text();
-
-                    if (content.toLowerCase().indexOf(val) == -1) {
-                        $(this).parents('div.item.col').hide();
-                    } else {
-                        $(this).parents('div.item.col').show();
-                    }
-
-                });
-
-            } else {
-                $('div.item.col').show();
-
-                var next_url = removeURLParameter(base_url, 'w2c_only');
-                $('#next_page').attr('href', next_url);
-            }
-        });
-
-        $('#top').on('click', function (e) {
-            e.preventDefault();
-        })
-
-    });
-</script>
+    </script>
 </body>
+
 </html>

@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "mainn.py", line 1, in <module>
+    from passlib.hash import sha256_crypt
+ModuleNotFoundError: No module named 'passlib'
+Pass is
+123456
+Connnn is
+postgresql://postgres:123456@localhost:5432/emerger
+Traceback (most recent call last):
+  File "mainn.py", line 10, in <module>
+    from models import Feeds
+  File "/var/www/html/emerga1/api/models.py", line 5, in <module>
+    from app import app
+  File "/var/www/html/emerga1/api/app.py", line 9, in <module>
+    import mainn
+  File "/var/www/html/emerga1/api/mainn.py", line 10, in <module>
+    from models import Feeds
+ImportError: cannot import name 'Feeds' from partially initialized module 'models' (most likely due to a circular import) (/var/www/html/emerga1/api/models.py)
+Pass is
+123456
+Connnn is
+postgresql://postgres:123456@localhost:5432/emerger
+Traceback (most recent call last):
+  File "mainn.py", line 10, in <module>
+    from models import Feeds
+  File "/var/www/html/emerga1/api/models.py", line 5, in <module>
+    from app import app
+  File "/var/www/html/emerga1/api/app.py", line 9, in <module>
+    import mainn
+  File "/var/www/html/emerga1/api/mainn.py", line 10, in <module>
+    from models import Feeds
+ImportError: cannot import name 'Feeds' from partially initialized module 'models' (most likely due to a circular import) (/var/www/html/emerga1/api/models.py)

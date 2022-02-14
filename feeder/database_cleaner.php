@@ -1,11 +1,11 @@
 <?php
 $servername = "localhost";
-$username = "Connnn";
-$password = "Karama@123";
-$dbname = "emerger";
+$username = "postgres";
+$password = "49V0E2Q6i0300mkA";
+$dbname = "fashionreps";
 
 // Create connection to postgress database
-$conn = pg_connect("host=servername, dbname=emerger, user=Connnn, password=Karama@123");
+$conn = pg_connect("host=servername, dbname=fashionreps, user=postgres, password=49V0E2Q6i0300mkA");
 
 // Check connection
 if ($conn->connect_error) {
