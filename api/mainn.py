@@ -84,6 +84,7 @@ def add_feeds(subreddit):
     imgur_iframe = json_request.get('imgur_iframe')
     w2c_link = json_request.get('w2c_link')
     gl_counter = json_request.get('gl_counter')
+    rl_counter = json_request.get('rl_counter')
 
     exists = Feeds.query.filter_by(reddit_link_id=reddit_link_id).first()
 
@@ -104,6 +105,9 @@ def add_feeds(subreddit):
             if exists.gl_counter != gl_counter:
                 exists.gl_counter != gl_counter
 
+            if exists.rl_counter != rl_counter:
+                exists.rl_counter = rl_counter
+
             db.session.commit()
             return {'message': 'Feed already exists. Tried to update info.'}, 409
         except Exception as err:
@@ -120,7 +124,8 @@ def add_feeds(subreddit):
             imgur_iframe=imgur_iframe,
             thumbnail_link=thumbnail_link,
             w2c_link=w2c_link,
-            gl_counter=gl_counter
+            gl_counter=gl_counter,
+            rl_counter=rl_counter
         )
 
         db.session.add(feed)

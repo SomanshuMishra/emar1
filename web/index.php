@@ -76,7 +76,7 @@ if (isset($_GET['search'])) {
     $subreddit = filter_input(INPUT_POST, 'subreddit', FILTER_SANITIZE_STRING);
 
     if (in_array($subreddit, $subreddits_array)) {
-        $data = callAPI('POST', $baseURL + "feeds/filter/$subreddit", json_encode(array("keyword" => $search_query), JSON_UNESCAPED_SLASHES));
+        $data = callAPI('POST', "http://127.0.0.1:5000/feeds/filter/$subreddit", json_encode(array("keyword" => $search_query), JSON_UNESCAPED_SLASHES));
         die($data);
     } else {
         die(json_encode(array("status" => "failed")));
@@ -132,6 +132,7 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
     <!-- Bootstrap v5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <!-- Custom Bootstrap Theming -->
     <link rel="stylesheet" href="assets/css/bootstrap.custom.css">
 
@@ -204,7 +205,9 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
             user-select: none;
         }
 
-        p.card-text {
+        p.card-text,
+        h3.card-text {
+            font-size: 18px;
             white-space: nowrap;
             width: 100%;
             overflow: hidden;
@@ -270,11 +273,63 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                 float: unset !important;
             }
         }
+
+        /* Footer */
+        .Footer {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-top: 2rem;
+            align-content: center;
+            align-items: center;
+            padding: 2rem 5rem;
+        }
+
+        .Footer .Socials {
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: row;
+            width: 80%;
+            justify-content: center;
+        }
+
+        .social-icon,
+        .Socials {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+        }
+
+        .Socials {
+            flex-direction: column;
+            font-size: 2rem;
+            width: 10vw;
+            color: #9c27b0;
+            color: var(--primary);
+        }
+
+        .Socials p {
+            width: 100%;
+        }
+
+        .Socials a {
+            text-decoration: none !important;
+        }
+
+        .Footer .Socials .social-icon {
+            padding: 0 1.5rem;
+        }
+
+        #footer-links a {
+            color: unset;
+            text-decoration: none !important;
+        }
     </style>
     <link href="assets/album/css/album.css" rel="stylesheet">
 </head>
 
-<body>
+<body is_w2c_only="<?php if (isset($_GET['w2c_only']) && $_GET['w2c_only'] === 'yes') : ?>yes<?php else : ?>no<?php endif; ?>">
     <a href="javascript:" id="return-to-top"><i class="fas fa-chevron-up"></i></a>
     <!-- Header old -->
     <!-- <header>
@@ -307,44 +362,13 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                     <!--<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> -->
                 </ul>
 
-                <!--                 <form class="d-flex">
-                    <input class="form-control me-2" type="text" placeholder="Filter List" aria-label="Search" name="filterword" id="filterword">
-                    <button class="btn btn-outline-secondary" type="submit">Search</button>
-                </form> -->
-
-            </div>
-        </div>
-    </header>
-    <!-- #Header new -->
-
-    <!-- Hero -->
-    <div class="px-4 py-5 text-center" style="background-image: url(https://image.shutterstock.com/shutterstock/photos/1870253185/display_1500/stock-photo-store-wall-with-white-sneakers-1870253185.jpg);background-size: cover;">
-        <img class="d-block mx-auto mb-4" src="https://glfinder.com/assets/favicon.png" alt="" width="75" height="75">
-        <h1 class="display-5 fw-bold">GL Finder</h1>
-        <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4">
-                Voluptas repudiandae odit iure quia blanditiis. Illo error nihil veritatis assumenda. Est et saepe
-                corrupti possimus id quis quo. Inventore et et animi sunt odio voluptatem. Non laudantium quia ipsum
-                blanditiis repudiandae explicabo incidunt eveniet.
-            </p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Primary button</button>
-                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Secondary</button>
-            </div>
-        </div>
-    </div>
-    <!-- #Hero -->
-
-
-
-    <main role="main">
-
-        <div class="album py-3 bg-light">
-            <div class="container">
-                <div class="pb-3">
-                    <label for="filterword">Filter List</label>
-                    <input type="text" name="filterword" id="filterword">
-                    <select class="custom-select custom-select-sm w-auto float-right" name="subreddit" id="subreddit" style="vertical-align: unset;">
+                <form class="d-flex" action="javascript:void(0);">
+                    <!-- Search -->
+                    <input class="form-control me-2" type="text" placeholder="Filter List" aria-label="Search" name="filterword" id="filterword" <?php $filter_value; ?>>
+                    <input type="hidden" name="w2c_only" id="w2c_only_input" value="<?php if (isset($_GET['w2c_only']) && $_GET['w2c_only'] === 'yes') : ?>yes<?php else : ?>no<?php endif; ?>">
+                    <!-- <button class="btn btn-outline-secondary" type="submit">Search</button> -->
+                    <!-- Subreddit -->
+                    <select class="form-select me-2" aria-label="Default select example" name="subreddit" id="subreddit">
                         <option value='' <?php if (!isset($subreddit)) {
                                                 echo "selected";
                                             } ?> disabled>Pick a subreddit
@@ -357,8 +381,9 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                             unset($selected);
                         } ?>
                     </select>
-                    &nbsp;
-                    <select class="custom-select custom-select-sm w-auto float-right" name="quantity" id="quantity" style="vertical-align: unset;">
+
+                    <!-- Quantity -->
+                    <select class="form-select me-2" aria-label="Default select example" name="quantity" id="quantity">
                         <?php foreach ($entries_array as $key => $entries) {
                             if ($size == $entries) {
                                 $selected = "selected";
@@ -368,17 +393,88 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                         } ?>
                     </select>
 
-                    <div class="form-check">
+                    <!-- W2C -->
+                    <input type="checkbox" class="btn-check" id="w2c_only" <?php echo $w2c_only; ?> autocomplete="off">
+                    <label class="btn btn-primary" for="w2c_only">W2C</label>
+
+                    <!--                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="w2c_only" <?php echo $w2c_only; ?>>
+                        <label class="form-check-label" for="w2c_only">W2C Only</label>
+                    </div> -->
+                </form>
+
+            </div>
+        </div>
+    </header>
+    <!-- #Header new -->
+
+    <!-- Hero -->
+    <div class="px-4 py-5 text-center" style="background-image: url();background-size: cover; background-position:center;">
+        <img class="d-block mx-auto mb-4" src="https://glfinder.com/assets/favicon.png" alt="" width="75" height="75">
+        <h1 class="display-5 fw-bold">GL Finder</h1>
+        <div class="col-lg-6 mx-auto">
+            <h2 class="lead mb-4">
+                Voluptas repudiandae odit iure quia blanditiis. Illo error nihil veritatis assumenda. Est et saepe
+                corrupti possimus id quis quo. Inventore et et animi sunt odio voluptatem. Non laudantium quia ipsum
+                blanditiis repudiandae explicabo incidunt eveniet.
+            </h2>
+            <!--             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Primary button</button>
+                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Secondary</button>
+            </div> -->
+        </div>
+    </div>
+    <!-- #Hero -->
+
+
+
+    <main role="main">
+
+        <div class="album py-3 bg-light">
+            <div class="container">
+
+                <!-- Old filter bar
+                <div class="pb-3">
+                                         <label for="filterword">Filter List</label>
+                    <input type="text" name="filterword" id="filterword" <#?php $filter_value; ?> > -->
+                <!--                     <select class="custom-select custom-select-sm w-auto float-right" name="subreddit" id="subreddit" style="vertical-align: unset;">
+                        <option value='' <#?php if (!isset($subreddit)) {
+                                                echo "selected";
+                                            } ?> disabled>Pick a subreddit
+                        </option>
+                        <#?php foreach ($subreddits_array as $key => $value) {
+                            if ($subreddit == $value) {
+                                $selected = "selected";
+                            }
+                            echo "<option value='$value' $selected>r/$value</option>";
+                            unset($selected);
+                        } ?>
+                    </select>
+                
+                    <select class="custom-select custom-select-sm w-auto float-right" name="quantity" id="quantity" style="vertical-align: unset;">
+                        <#?php foreach ($entries_array as $key => $entries) {
+                            if ($size == $entries) {
+                                $selected = "selected";
+                            }
+                            echo "<option value='$entries' $selected>$entries Entries</option>";
+                            unset($selected);
+                        } ?>
+                    </select>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="w2c_only" <#?php echo $w2c_only; ?>>
                         <label class="form-check-label" for="w2c_only">W2C Only</label>
                     </div>
                 </div>
+                    -->
 
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="main_holder">
                     <?php
                     $results_data = results($timestamp, $subreddit, $size);
                     foreach ($results_data['assets'] as $datum) {
 
+                        /* print'<pre>';
+                        print_r($datum);
+                        print'</pre>'; */
                         if (isset($datum['imgur_iframe'])) {
                             $imgur_preview = $datum['imgur_iframe'];
                         }
@@ -395,42 +491,27 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
 
                         if ($datum['thumbnail_link'] != null) {
                             $image = "$datum[thumbnail_link]";
-                            // echo '<pre>';
-                            // echo strlen($image);
-                            // echo $datum['reddit_title'];   
-                            $imgHeaders = @get_headers(str_replace(" ", "%20", $image))[0];
-                            if ($imgHeaders == 'HTTP/1.1 404 Not Found') {
-                                $image = NULL;
-                                //$i =  "https://www.reddit.com/$datum[reddit_link].json";
-                                // echo $x;
-                                //$curl= curl_init();
-                                //curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                                //curl_setopt($curl, CURLOPT_URL, $i);
-                                //$res = curl_exec($curl);
-                                //curl_close($curl);
-                                //$t = json_decode($res,True)[1]['data']['children'][2]['data']['replies']['data']['children'][0]['data']['body'];
-                                //$word = 'https://item.taobao.com';
-                                //if (strpos($t, $word) === FALSE) {
+                            // ;                              echo $image;
+                            // $imgHeaders = @get_headers(str_replace(" ", "%20", $image))[0];
+                            // if ($imgHeaders == 'HTTP/1.1 404 Not Found') {
+                            //     $image = NULL;
 
-                                //}else{
-                                //	echo $t;
-                                //    $w2c = $t;
-                                //}
-                            }
+                            // }
                         } else {
-                            // $image = null;
-                            $i =  "https://www.reddit.com/$datum[reddit_link].json";
-                            // echo $x;
-                            // $u  = 'https://www.reddit.com/r/FashionReps/comments/sd4u1o/qc_lv_belt_from_bs_v2_wouldnt_let_me_put_the_pics/.json';
-                            $curl = curl_init();
-                            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                            curl_setopt($curl, CURLOPT_URL, $i);
-                            $res = curl_exec($curl);
-                            curl_close($curl);
-                            $x = json_decode($res, True)[0]['data']['children'][0]['data']['thumbnail'];
+                            // echo 'here'; 
+                            $image = NULL;
+                            // $i =  "https://www.reddit.com/$datum[reddit_link].json";
+                            // // echo $x;
+                            // // $u  = 'https://www.reddit.com/r/FashionReps/comments/sd4u1o/qc_lv_belt_from_bs_v2_wouldnt_let_me_put_the_pics/.json';
+                            // $curl = curl_init();
+                            // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                            // curl_setopt($curl, CURLOPT_URL, $i);
+                            // $res = curl_exec($curl);
+                            // curl_close($curl);
+                            // $x = json_decode($res, True)[0]['data']['children'][0]['data']['thumbnail'];            
                             // echo 'x value here \n';
                             // echo $x;
-                            //$t = json_decode($res,True)[1]['data']['children'][2]['data']['replies']['data']['children'][0]['data']['body'];
+                            //$t = json_de  code($res,True)[1]['data']['children'][2]['data']['replies']['data']['children'][0]['data']['body'];
                             //$word = 'https://item.taobao.com';
                             //if (strpos($t, $word) === FALSE) {
 
@@ -438,13 +519,13 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                             //   $w2c = $t;
                             //}
 
-                            if (strlen($x) < 20) {
-                                //echo 'inside if';
-                                $image = NULL;
-                            } else {
-                                // echo 'in else statement';
-                                $image = $x;
-                            }
+                            // if (strlen($x) < 20) {
+                            //     //echo 'inside if';
+                            //     $image = NULL;
+                            // } else {
+                            //     // echo 'in else statement';
+                            //     $image = $x;
+                            // }
                         }
 
 
@@ -455,6 +536,27 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                         if ($datum['gl_counter'] !== 1) {
                             $gl_counter = $datum['gl_counter'];
                         }
+                        if ($datum['rl_counter'] !== 1) {
+                            $rl_counter = $datum['rl_counter'];
+                        }
+
+                        if (!isset($gl_counter) || $gl_counter <= 0) {
+                            $gl_counter = 0;
+                        }
+                        if (!isset($rl_counter) || $rl_counter <= 0) {
+                            $rl_counter = 0;
+                        }
+
+                        /* Button color */
+
+                        if ($gl_counter > $rl_counter) {
+                            $btn_color = 'btn-success';
+                        } else if ($rl_counter > $gl_counter) {
+                            $btn_color = 'btn-primary';
+                        } else if ($gl_counter == $rl_counter) {
+                            $btn_color = 'btn-secondary';
+                        }
+
                         //if ($image!=null){
                         //    $imgHeaders = @get_headers( str_replace(" ", "%20", $image) )[0];
                         //    if( $imgHeaders == 'HTTP/1.1 404 Not Found' ) {
@@ -463,63 +565,105 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                         //    }
                         //}
                     ?>
-                        <div class="item col" <?php echo "data-id='$datum[reddit_link_id]'" ?>>
-                            <div class="card mb-4 shadow-sm">
-                                <a href="<?php echo "https://www.reddit.com$datum[reddit_link]"; ?>" target='_blank' rel='noreferrer'>
-                                    <?php if (!isset($image)) { ?>
-                                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Thumbnail">
-                                            <title><?php echo "$datum[reddit_title]"; ?></title>
-                                            <rect width="100%" height="100%" fill="#55595c" />
-                                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text>
-                                        </svg>
-                                    <?php } else { ?>
-                                        <img class="bd-placeholder-img card-img-top lazy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3C/svg%3E" data-src="<?php echo "$image"; ?>" alt="<?php echo "$datum[reddit_title]"; ?>" title="<?php echo "$datum[reddit_title]"; ?>" height="225" width="100%" style="object-fit: cover;object-position: 50% 50%" />
-                                    <?php } ?>
-                                </a>
+                        <div class="item col mb-4 <?php if (!isset($imgur_preview) && !isset($w2c)) {
+                                                        echo 'no-button"';
+                                                    } else {
+                                                        echo '"';
+                                                    };
+                                                    echo "data-id='$datum[reddit_link_id]'" ?>>
+                            <!-- Card -->
+                            <div class=" card mb-4 shadow-sm h-100">
+                            <a href="<?php echo "https://www.reddit.com$datum[reddit_link]"; ?>" target='_blank' rel='noreferrer'>
+                                <?php if (!isset($image)) { ?>
+                                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="https://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Thumbnail">
+                                        <title><?php echo "$datum[reddit_title]"; ?></title>
+                                        <rect width="100%" height="100%" fill="#55595c" />
+                                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail not available</text>
+                                    </svg>
+                                <?php } else { ?>
+                                    <img class="bd-placeholder-img card-img-top lazy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3C/svg%3E" data-src="<?php echo "$image"; ?>" alt="<?php echo "$datum[reddit_title]"; ?>" title="<?php echo "$datum[reddit_title]"; ?>" height="225" width="100%" style="object-fit: cover;object-position: 50% 50%" />
+                                <?php } ?>
+                            </a>
 
-                                <div class="card-body flex-column h-100">
-                                    <p class="card-text"><?php echo "$datum[reddit_title]"; ?></p>
-                                    <div class="justify-content-between align-items-center">
-                                        <small class="text-muted post_date" <?php $date = $datum['reddit_created_utc'];
-                                                                            echo "data-timestamp='$date'";
-                                                                            unset($date); ?>></small>
-                                        <div class="btn-group float-right">
+                            <div class="card-body d-flex flex-column h-100" style="justify-content: space-between;">
+                                <!-- Title -->
+                                <h3 class="card-text"><?php echo "$datum[reddit_title]"; ?></h3>
+
+                                <div class="justify-content-between align-items-center">
+
+                                    <!-- Buttons -->
+                                    <div>
+                                        <div class="align-self-end btn-grouped">
                                             <?php if (isset($imgur_preview)) { ?>
-                                                <a href="<?php echo $imgur_preview; ?>" class="btn btn-sm btn-outline-secondary" target='_blank' rel='noreferrer'>Imgur</a>
+                                                <a href="<?php echo $imgur_preview; ?>" class="btn btn-sm btn-primary mb-2" target='_blank' style="width:100%" rel='noreferrer'>Imgur <i class="bi bi-card-image"></i></a>
                                             <?php }
                                             if (isset($w2c)) { ?>
-                                                <a href="<?php echo $w2c; ?>" class="btn btn-sm btn-outline-secondary" target='_blank' rel='noreferrer'>W2C</a>
+                                                <a href="<?php echo $w2c; ?>" class="btn btn-sm <?php echo $btn_color ?>" target='_blank' style="width:100%" rel='noreferrer'>W2C <i class="bi bi-link-45deg"></i></a>
                                             <?php } ?>
                                         </div>
                                     </div>
+                                    <!-- #Buttons -->
+
                                 </div>
-                                <?php if (isset($gl_counter)) { ?>
-                                    <div class="circle">
-                                        <p class="text-circle"><?php echo $gl_counter; ?></p>
-                                    </div>
-                                <?php } ?>
                             </div>
+                            <div class="card-footer" style="display:flex;flex-direction:row;justify-content: space-between;">
+                                <div>
+                                    <!-- Report -->
+                                    <a data-bs-toggle="tooltip" title="Report on Reddit" href="<?php echo "https://www.reddit.com$datum[reddit_link]"; ?>" target='_blank' rel='noreferrer'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-flag-fill me-2" viewBox="0 0 16 16">
+                                            <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001" />
+                                        </svg></a>
+                                    <!-- Date -->
+                                    <small class="text-muted post_date" <?php
+                                                                        $date = $datum['reddit_created_utc'];
+                                                                        echo "data-timestamp='$date'";
+                                                                        unset($date);
+                                                                        ?>>
+                                    </small>
+                                </div>
+                                <!-- Vote -->
+                                <div>
+                                    <span style="color:var(--success);white-space: nowrap;"><i class="bi bi-arrow-up-short"></i><?php echo $gl_counter; ?> GL</span> <span style="color:var(--primary);white-space: nowrap;"><i class="bi bi-arrow-down-short"></i><?php echo $rl_counter; ?> RL</span>
+                                </div>
+                            </div>
+                            <!-- Counter GL -->
+                            <!-- <#?php if (isset($gl_counter)) { ?>
+                                <div class="circle">
+                                    <p class="text-circle"><#?php echo $gl_counter; ?></p>
+                                </div>
+                            <#?php } ?> -->
                         </div>
-                    <?php
-                        unset($titulo, $image, $imgur_preview, $w2c, $gl_counter);
+                        <!-- #Card -->
+                </div>
+            <?php
+                        unset($titulo, $image, $imgur_preview, $w2c, $gl_counter, $rl_counter);
                         $last_timestamp = $datum['reddit_created_utc'];
                     }
                     unset($datum);
 
-                    ?>
+            ?>
 
-                </div>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="search_holder" hidden>
-
-                </div>
             </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="search_holder" hidden>
+
+            </div>
+        </div>
         </div>
 
     </main>
 
     <footer class="text-muted">
+        <!-- Next Button -->
         <div class="container">
-            <a id="next_page" href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>" data-href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>">Next</a>
+            <a id="next_page" class="btn btn-outline-primary" href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>" data-href="<?php echo $next_item . $last_timestamp . $size_get . $w2c_uri ?>">Next page <i class="bi bi-chevron-double-right"></i></a>
+        </div>
+
+        <!-- Footer -->
+        <div class="Footer">
+            <div class="Socials"><a href="/discord"><i class="fab fa-discord social-icon" aria-hidden="true"></i></a><a href="https://reddit.com/r/reparchive" rel="author noopener noreferrer nofollow"><i class="fab fa-reddit social-icon" aria-hidden="true"></i></a><a href="/youtube" rel="author noopener noreferrer nofollow"><i class="fab fa-youtube social-icon" aria-hidden="true"></i></a><a href="https://twitter.com/reparchive" rel="author noopener noreferrer nofollow"><i class="fab fa-twitter social-icon" aria-hidden="true"></i></a><a href="/account" rel="author noopener noreferrer nofollow"><i class="fas fa-sign-in-alt social-icon" aria-hidden="true"></i></a></div>
+            <p style="text-align: left; font-size: 0.9em;">
+            <p>Disclaimer: This is a live feed pulled from external sources, we cannot take responsibility for any items listed here. Please contact the sellers or marketplace provider for complaints. No warranties for correctness of information. CH Web Development is not affiliated with any items or brands shown. </p>
+            <p id="footer-links"><a href="https://ch-webdev.com" rel="author noopener noreferrer" target="_blank" title="CH Web Development Homepage">Developed by CH Web Development</a> &copy; 2022 | <a href="https://ch-webdev.com/contact" rel="author noopener noreferrer nofollow" target="_blank">Contact</a> | <a href="https://ch-webdev.com/impressum/" rel="author noopener noreferrer nofollow" target="_blank" title="Impressum">Impressum</a> | <a href="https://ch-webdev.com/privacy-policy/" rel="author noopener noreferrer nofollow" target="_blank">Privacy</a></p>
         </div>
     </footer>
 
@@ -615,29 +759,27 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
             }
 
             function w2c_only() {
-                var base_url = $('#next_page').data('href') + '&w2c_only=yes';
-
+                var base_url = $('#next_page').data('href') + '&w2c_only=';
+                let is_w2c_only = 'no';
                 if ($('#w2c_only').is(":checked")) {
-
-                    $('#next_page').attr('href', base_url);
-
-                    $("div.btn-group").each(function(i) {
-                        var val = 'w2c';
-                        var content = $(this).find('a.btn-outline-secondary').text();
-
-                        if (content.toLowerCase().indexOf(val) == -1) {
-                            $(this).parents('div.item.col').hide();
-                        } else {
-                            $(this).parents('div.item.col').show();
-                        }
-                    });
+                    is_w2c_only = 'yes';
+                    base_url += is_w2c_only;
+                    $(".no-button").hide();
+                    // if .hide() doesn't work try the second one 
+                    $(".no-button").css('display', 'none');
+                } else {
+                    base_url += is_w2c_only;
+                    $(".no-button").show();
                 }
+                $('body').attr('is_w2c_only', is_w2c_only);
+                $("#w2c_only_input").val(is_w2c_only);
+                // alert(is_w2c_only)
+                $('#next_page').attr('href', base_url);
             }
 
             function doneTyping() {
                 var search = $search.val();
                 if (search != "") {
-
                     $.ajax({
                         url: '?search',
                         type: 'post',
@@ -649,7 +791,6 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                         success: function(response) {
 
                             var len = response['assets'].length;
-
                             $('#main_holder').prop('hidden', true);
                             $("#search_holder").empty();
 
@@ -709,12 +850,14 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                                 $("#search_holder").append(reddit_card);
                                 tooltip();
                             }
+                            // alert('hehe');
                             convert_dates();
                             lazyLoadInstance.update();
                             $("#search_holder").prop('hidden', false);
                             $('#next_page').prop('hidden', true);
                         }
                     });
+
                 } else {
                     $("#search_holder").prop('hidden', true);
                     $('#next_page').prop('hidden', false);
@@ -730,6 +873,7 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
 
             $search.on('keyup', function() {
                 clearTimeout(typingTimer);
+                // alert($search.val());
                 typingTimer = setTimeout(doneTyping, doneTypingInterval);
             });
 
@@ -751,8 +895,9 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
                 var next_url = removeURLParameter(window.location.href, 'subreddit');
 
                 if (subreddit) {
+                    let w2c_only = '&w2c_only=' + $("body").attr('is_w2c_only');
                     var url = next_url + operator;
-                    window.location = url + "subreddit=" + subreddit;
+                    window.location = url + "&subreddit=" + subreddit + w2c_only;
                 }
 
                 return false;
@@ -779,30 +924,7 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
             });
 
             $('#w2c_only').on('change', function() {
-                var base_url = $('#next_page').data('href') + '&w2c_only=yes';
-
-                if ($(this).is(":checked")) {
-
-                    $('#next_page').attr('href', base_url);
-
-                    $("div.btn-group").each(function(i) {
-                        var val = 'w2c';
-                        var content = $(this).find('a.btn-outline-secondary').text();
-
-                        if (content.toLowerCase().indexOf(val) == -1) {
-                            $(this).parents('div.item.col').hide();
-                        } else {
-                            $(this).parents('div.item.col').show();
-                        }
-
-                    });
-
-                } else {
-                    $('div.item.col').show();
-
-                    var next_url = removeURLParameter(base_url, 'w2c_only');
-                    $('#next_page').attr('href', next_url);
-                }
+                w2c_only();
             });
 
             $('#top').on('click', function(e) {
@@ -810,7 +932,18 @@ if (isset($_GET['w2c_only']) && $_GET['w2c_only'] == 'yes') {
             })
 
         });
+
+        /* Tooltips */
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     </script>
+    <?php if (isset($_GET['w2c_only']) && $_GET['w2c_only'] === 'yes') : ?>
+        <script>
+            w2c_only();
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>
